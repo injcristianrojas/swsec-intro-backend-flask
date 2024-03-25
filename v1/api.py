@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify
 from db import connect_db
 
-api_v2 = Blueprint('APIv2', __name__)
+api_v1 = Blueprint('APIv1', __name__)
 
-@api_v2.route("/messages")
+@api_v1.route("/messages")
 def messages():
     conn = connect_db()
     cur = conn.cursor()
@@ -20,7 +20,7 @@ def messages():
     
     return jsonify(json_results)
 
-@api_v2.route("/users/type/<id>")
+@api_v1.route("/users/type/<id>")
 def get_users_by_type(id):
     conn = connect_db()
     cur = conn.cursor()
@@ -33,6 +33,6 @@ def get_users_by_type(id):
 
     json_results = []
     for row in results:
-        json_results.append({'id': row[0], 'username': row[1]})
+        json_results.append({'id': row[0], 'username': row[1], 'password': row[2]})
     
     return jsonify(json_results)
