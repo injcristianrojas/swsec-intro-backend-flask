@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify
 from db import connect_db
 
-api_v2 = Blueprint('APIv2', __name__)
+api = Blueprint('APIv2', __name__)
 
-@api_v2.route("/messages")
+@api.route("/messages")
 def messages():
     conn = connect_db()
     cur = conn.cursor()
@@ -20,7 +20,7 @@ def messages():
     
     return jsonify(json_results)
 
-@api_v2.route("/users/type/<id>")
+@api.route("/users/type/<id>")
 def get_users_by_type(id):
     conn = connect_db()
     cur = conn.cursor()
