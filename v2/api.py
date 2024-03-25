@@ -4,7 +4,7 @@ from db import connect_db
 
 api_v2 = Blueprint('APIV1', __name__)
 
-@api_v2.route("/api/v2/messages")
+@api_v2.route("/messages")
 def messages():
     conn = connect_db()
     cur = conn.cursor()
