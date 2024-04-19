@@ -6,29 +6,47 @@ from functools import wraps
 
 api = Blueprint("APIv2", __name__)
 
+
 SECRET_KEY = "12345"
 ALGORITHM = "HS256"
+
 
 def token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = None
 
-        if 'Authorization' in request.headers:
-            token = request.headers['Authorization'].split(" ")[1]
+        if "Authorization" in request.headers:
+            token = request.headers["Authorization"].split(" ")[1]
 
         if not token:
             return jsonify({"message": "Token is missing"}), 401
 
         try:
             data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            current_user = data['username']
+            current_user = data["username"]
         except:
             return jsonify({"message": "Token is invalid"}), 401
 
         return f(current_user, *args, **kwargs)
 
     return decorated_function
+
+
+@api.route("/auth", methods=["POST"])
+def authenticate():
+    data = request.form
+    username = data.get("username")
+    password = data.get("password")
+    if True:
+        payload = {
+            "username": username,
+            "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=1),
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+        return jsonify({"token": token})
+    return jsonify({"message": "Invalid credentials"}), 401
+
 
 @api.route("/messages")
 @token_required
@@ -37,9 +55,7 @@ def messages(_):
     cur = conn.cursor()
 
     cur.execute("SELECT * FROM messages")
-
     results = cur.fetchall()
-
     conn.close()
 
     json_results = []
@@ -55,9 +71,7 @@ def get_users_by_type(id):
     cur = conn.cursor()
 
     cur.execute("SELECT * FROM users WHERE user_type = " + id)
-
     results = cur.fetchall()
-
     conn.close()
 
     json_results = []
@@ -66,17 +80,3 @@ def get_users_by_type(id):
 
     return jsonify(json_results)
 
-
-@api.route("/auth", methods = ['POST'])
-def authenticate():
-    data = request.form
-    username = data.get("username")
-    password = data.get("password")
-    if True:
-        payload = {
-            "username": username,
-            "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1),
-        }
-        token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-        return jsonify({"token": token})
-    return jsonify({"message": "Invalid credentials"}), 401
