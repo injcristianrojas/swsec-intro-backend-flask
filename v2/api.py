@@ -32,8 +32,15 @@ def token_required(f):
 
     return decorated_function
 
-def is_user_valid(username, password):
-    return True
+def get_user_data(username, password):
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "'")
+    results = cur.fetchall()
+    conn.close()
+    if len(results) is 0:
+        return None
+    return {'username': results[0][1], 'type': results[0][3]}
 
 
 @api.route("/auth", methods=["POST"])
@@ -41,14 +48,18 @@ def authenticate():
     data = request.form
     username = data.get("username")
     password = data.get("password")
-    if is_user_valid(username, password):
-        payload = {
-            "username": username,
-            "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=6),
-        }
-        token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-        return jsonify({"token": token})
-    return jsonify({"message": "Invalid credentials"}), 401
+    user_data = get_user_data(username, password)
+    if user_data is None:
+        return jsonify({"message": "Invalid credentials"}), 401
+    print(user_data)
+    payload = {
+        "username": user_data['username'],
+        "type": user_data['type'],
+        "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=6),
+    }
+    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    return jsonify({"token": token})
+    
 
 
 @api.route("/messages")
