@@ -38,7 +38,7 @@ def get_user_data(username, password):
     cur.execute("SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "'")
     results = cur.fetchall()
     conn.close()
-    if len(results) is 0:
+    if len(results) == 0:
         return None
     return {'username': results[0][1], 'type': results[0][3]}
 
@@ -51,7 +51,6 @@ def authenticate():
     user_data = get_user_data(username, password)
     if user_data is None:
         return jsonify({"message": "Invalid credentials"}), 401
-    print(user_data)
     payload = {
         "username": user_data['username'],
         "type": user_data['type'],
