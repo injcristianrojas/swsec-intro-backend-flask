@@ -1,15 +1,38 @@
 import datetime
+import jwt
 from flask import Blueprint, jsonify, request
 from db import connect_db
-import jwt
+from functools import wraps
 
 api = Blueprint("APIv2", __name__)
 
 SECRET_KEY = "12345"
 ALGORITHM = "HS256"
 
+def token_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = None
+
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'].split(" ")[1]
+
+        if not token:
+            return jsonify({"message": "Token is missing"}), 401
+
+        try:
+            data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            current_user = data['username']
+        except:
+            return jsonify({"message": "Token is invalid"}), 401
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated_function
+
 @api.route("/messages")
-def messages():
+@token_required
+def messages(_):
     conn = connect_db()
     cur = conn.cursor()
 
