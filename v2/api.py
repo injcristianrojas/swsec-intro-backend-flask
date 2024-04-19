@@ -32,16 +32,19 @@ def token_required(f):
 
     return decorated_function
 
+def is_user_valid(username, password):
+    return True
+
 
 @api.route("/auth", methods=["POST"])
 def authenticate():
     data = request.form
     username = data.get("username")
     password = data.get("password")
-    if True:
+    if is_user_valid(username, password):
         payload = {
             "username": username,
-            "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=1),
+            "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=6),
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
         return jsonify({"token": token})
