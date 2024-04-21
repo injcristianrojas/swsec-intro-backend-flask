@@ -7,7 +7,7 @@ from functools import wraps
 api = Blueprint("APIv2", __name__)
 
 
-SECRET_KEY = "12345"
+SECRET_KEY = "123"
 ALGORITHM = "HS256"
 
 
