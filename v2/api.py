@@ -43,9 +43,9 @@ def get_user_data(username, password):
     return {'username': results[0][1], 'type': results[0][3]}
 
 
-@api.route("/auth", methods=["POST"])
+@api.route("/login", methods=["POST"])
 def authenticate():
-    data = request.form
+    data = request.json
     username = data.get("username")
     password = data.get("password")
     user_data = get_user_data(username, password)
