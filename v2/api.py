@@ -80,7 +80,6 @@ def messages(_):
 @token_required
 def post_message(_):
     message = request.get_json().get('message')
-    print(message)
     conn = connect_db()
     cur = conn.cursor()
     cur.execute("INSERT INTO messages(message) VALUES ('" + message + "')");
