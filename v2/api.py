@@ -76,6 +76,20 @@ def messages(_):
     return jsonify(json_results)
 
 
+@api.route("/messages/add", methods = ['POST'])
+@token_required
+def post_message(_):
+    message = request.get_json().get('message')
+    print(message)
+    conn = connect_db()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO messages(message) VALUES ('" + message + "')");
+    conn.commit()
+    conn.close()
+
+    return jsonify([{'status': 'OK'}])
+
+
 @api.route("/users/type/<id>")
 def get_users_by_type(id):
     conn = connect_db()
