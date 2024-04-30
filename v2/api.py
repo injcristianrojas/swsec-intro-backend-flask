@@ -65,7 +65,6 @@ def authenticate():
 def messages(_):
     conn = connect_db()
     cur = conn.cursor()
-
     cur.execute("SELECT * FROM messages")
     results = cur.fetchall()
     conn.close()
@@ -81,7 +80,6 @@ def messages(_):
 def get_users_by_type(id):
     conn = connect_db()
     cur = conn.cursor()
-
     cur.execute("SELECT * FROM users WHERE user_type = " + id)
     results = cur.fetchall()
     conn.close()
