@@ -13,4 +13,4 @@ app.register_blueprint(api_v2, url_prefix='/api/v2')
 
 if __name__ == "__main__":
     init_db()
-    app.run(port=9000)
+    app.run(host='0.0.0.0', port=9000)
