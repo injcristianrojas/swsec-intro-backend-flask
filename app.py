@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-from flask_restx import Api, Resource, fields
+from flask_restx import Api, Resource
 
 from db import init_db, connect_db
 from v1.api import api as api_v1
