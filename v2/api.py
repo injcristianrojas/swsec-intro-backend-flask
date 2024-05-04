@@ -1,10 +1,15 @@
 import datetime
 import jwt
+from flask_restx import Api, Resource
 from flask import Blueprint, jsonify, request
 from db import connect_db
 from functools import wraps
 
-api = Blueprint("APIv2", __name__)
+blueprint = Blueprint('api_v2', __name__)
+api = Api(blueprint, version="1.0",
+    title="My API v2",
+    description="A simple Flask API",
+    doc="/swaggerui",)
 
 SECRET_KEY = "123"
 ALGORITHM = "HS256"
@@ -43,62 +48,67 @@ def get_user_data(username, password):
     return {"username": results[0][1], "type": results[0][3]}
 
 
-@api.route("/login", methods=["POST"])
-def authenticate():
-    data = request.json
-    username = data.get("username")
-    password = data.get("password")
-    user_data = get_user_data(username, password)
-    if user_data is None:
-        return jsonify({"message": "Invalid credentials"}), 401
-    payload = {
-        "username": user_data["username"],
-        "type": user_data["type"],
-        "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=6),
-    }
-    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-    return jsonify({"token": token})
+@api.route("/login")
+class Authenticate(Resource):
+    def post(self):
+        data = request.json
+        username = data.get("username")
+        password = data.get("password")
+        user_data = get_user_data(username, password)
+        if user_data is None:
+            return jsonify({"message": "Invalid credentials"}), 401
+        payload = {
+            "username": user_data["username"],
+            "type": user_data["type"],
+            "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=6),
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+        return jsonify({"token": token})
 
 
 @api.route("/messages")
-@token_required
-def messages(_):
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM messages")
-    results = cur.fetchall()
-    conn.close()
+class Messages(Resource):
+    @token_required
+    def get(self, _):
+        conn = connect_db()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM messages")
+        results = cur.fetchall()
+        conn.close()
 
-    json_results = []
-    for row in results:
-        json_results.append({"id": row[0], "message": row[1]})
+        json_results = []
+        for row in results:
+            json_results.append({"id": row[0], "message": row[1]})
 
-    return jsonify(json_results)
+        return jsonify(json_results)
 
 
-@api.route("/messages/add", methods = ['POST'])
-@token_required
-def post_message(_):
-    message = request.get_json().get('message')
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute("INSERT INTO messages(message) VALUES ('" + message + "')");
-    conn.commit()
-    conn.close()
+@api.route("/messages/add")
+class AddMessage(Resource):
+    @token_required
+    def post(self, _):
+        message = request.get_json().get('message')
+        conn = connect_db()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO messages(message) VALUES ('" + message + "')");
+        conn.commit()
+        conn.close()
 
-    return jsonify([{'status': 'OK'}])
+        return jsonify([{'status': 'OK'}])
 
 
 @api.route("/users/type/<id>")
-def get_users_by_type(id):
-    conn = connect_db()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM users WHERE user_type = " + id)
-    results = cur.fetchall()
-    conn.close()
+class UsersByType(Resource):
+    @token_required
+    def get(self, id):
+        conn = connect_db()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE user_type = " + id)
+        results = cur.fetchall()
+        conn.close()
 
-    json_results = []
-    for row in results:
-        json_results.append({"id": row[0], "username": row[1]})
+        json_results = []
+        for row in results:
+            json_results.append({"id": row[0], "username": row[1]})
 
-    return jsonify(json_results)
+        return jsonify(json_results)

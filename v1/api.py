@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_restx import Api, Resource
 from db import connect_db
 
-blueprint = Blueprint('APIv1', __name__)
+blueprint = Blueprint('api_v1', __name__)
 api = Api(blueprint, version="1.0",
     title="My API v1",
     description="A simple Flask API",
