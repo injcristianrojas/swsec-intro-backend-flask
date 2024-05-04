@@ -1,12 +1,15 @@
 from flask import Blueprint, jsonify, request
-from flask_restx import Api, Resource
+from flask_restx import Api, Resource, fields
 from db import connect_db
 
-blueprint = Blueprint('api_v1', __name__)
-api = Api(blueprint, version="1.0",
+blueprint = Blueprint("api_v1", __name__)
+api = Api(
+    blueprint,
+    version="1.0",
     title="My API v1",
     description="A simple Flask API",
-    doc="/swaggerui",)
+    doc="/swaggerui",
+)
 
 @api.route("/messages")
 class Messages(Resource):
@@ -26,6 +29,7 @@ class Messages(Resource):
 
 @api.route("/messages/add")
 class AddMessage(Resource):
+    @api.doc(body=api.model("Message Data", {"message": fields.String}))
     def post(self):
         message = request.get_json().get("message")
         print(message)

@@ -1,15 +1,18 @@
 import datetime
 import jwt
-from flask_restx import Api, Resource
+from flask_restx import Api, Resource, fields
 from flask import Blueprint, jsonify, request
 from db import connect_db
 from functools import wraps
 
-blueprint = Blueprint('api_v2', __name__)
-api = Api(blueprint, version="1.0",
+blueprint = Blueprint("api_v2", __name__)
+api = Api(
+    blueprint,
+    version="1.0",
     title="My API v2",
     description="A simple Flask API",
-    doc="/swaggerui",)
+    doc="/swaggerui",
+)
 
 SECRET_KEY = "123"
 ALGORITHM = "HS256"
@@ -28,6 +31,7 @@ def token_required(f):
         except:
             return jsonify({"message": "Token is invalid"}), 401
         return f(current_user, *args, **kwargs)
+
     return decorated_function
 
 
@@ -50,6 +54,7 @@ def get_user_data(username, password):
 
 @api.route("/login")
 class Authenticate(Resource):
+    @api.doc(body=api.model("Login data", {"username": fields.String, "password": fields.String}))
     def post(self):
         data = request.json
         username = data.get("username")
@@ -85,16 +90,17 @@ class Messages(Resource):
 
 @api.route("/messages/add")
 class AddMessage(Resource):
+    @api.doc(body=api.model("Message Data", {"message": fields.String}))
     @token_required
     def post(self, _):
-        message = request.get_json().get('message')
+        message = request.get_json().get("message")
         conn = connect_db()
         cur = conn.cursor()
-        cur.execute("INSERT INTO messages(message) VALUES ('" + message + "')");
+        cur.execute("INSERT INTO messages(message) VALUES ('" + message + "')")
         conn.commit()
         conn.close()
 
-        return jsonify([{'status': 'OK'}])
+        return jsonify([{"status": "OK"}])
 
 
 @api.route("/users/type/<id>")
