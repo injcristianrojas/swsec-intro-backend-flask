@@ -68,7 +68,7 @@ class Authenticate(Resource):
             "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=6),
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-        return jsonify({"token": token})
+        return jsonify(token=token)
 
 
 @api.route("/messages")
@@ -100,7 +100,7 @@ class AddMessage(Resource):
         conn.commit()
         conn.close()
 
-        return jsonify([{"status": "OK"}])
+        return jsonify(status="OK")
 
 
 @api.route("/users/type/<id>")
