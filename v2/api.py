@@ -57,11 +57,11 @@ class Authenticate(Resource):
     @api.doc(body=api.model("Login data", {"username": fields.String, "password": fields.String}))
     def post(self):
         data = request.json
-        username = data.get("username")
-        password = data.get("password")
+        username = data.get("username", "")
+        password = data.get("password", "")
         user_data = get_user_data(username, password)
         if user_data is None:
-            return jsonify({"message": "Invalid credentials"}), 401
+            return "Invalid credentials", 401
         payload = {
             "username": user_data["username"],
             "type": user_data["type"],
