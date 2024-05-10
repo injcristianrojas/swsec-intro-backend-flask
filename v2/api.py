@@ -24,12 +24,12 @@ def token_required(f):
         if "Authorization" in request.headers:
             token = request.headers["Authorization"].split(" ")[1]
         if not token:
-            return jsonify({"message": "Token is missing"}), 401
+            return "Token is missing", 401
         try:
             data = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             current_user = data["username"]
-        except:
-            return jsonify({"message": "Token is invalid"}), 401
+        except Exception:
+            return "Token is invalid", 401
         return f(current_user, *args, **kwargs)
 
     return decorated_function
@@ -106,7 +106,7 @@ class AddMessage(Resource):
 @api.route("/users/type/<id>")
 class UsersByType(Resource):
     @token_required
-    def get(self, id):
+    def get(self, _, id):
         conn = connect_db()
         cur = conn.cursor()
         cur.execute("SELECT * FROM users WHERE user_type = " + id)
@@ -118,3 +118,5 @@ class UsersByType(Resource):
             json_results.append({"id": row[0], "username": row[1]})
 
         return jsonify(json_results)
+
+#@api.route("/users/user/<username>")
