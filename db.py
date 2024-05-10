@@ -20,6 +20,7 @@ def init_db():
     cur.execute("INSERT INTO users(username,password,user_type) VALUES ('zorzal', 'fio', 2)");
     cur.execute("INSERT INTO users(username,password,user_type) VALUES ('chincol', 'fiofio', 2)");
     cur.execute("INSERT INTO users(username,password,user_type) VALUES ('tiuque', 'pah', 2)");
+    cur.execute("INSERT INTO users(username,password,user_type) VALUES ('loica', 'roji', 2)");
 
     conn.commit()
     conn.close()
