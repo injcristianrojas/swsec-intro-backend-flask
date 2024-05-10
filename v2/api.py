@@ -118,5 +118,3 @@ class UsersByType(Resource):
             json_results.append({"id": row[0], "username": row[1]})
 
         return jsonify(json_results)
-
-#@api.route("/users/user/<username>")
