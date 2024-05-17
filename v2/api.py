@@ -31,7 +31,6 @@ def token_required(f):
         except Exception:
             return "Token is invalid", 401
         return f(current_user, *args, **kwargs)
-
     return decorated_function
 
 
