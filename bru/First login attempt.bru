@@ -1,0 +1,15 @@
+meta {
+  name: First login attempt
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://127.0.0.1:9000/api/v2/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {"username": "admin", "password": "admin"}
+}
